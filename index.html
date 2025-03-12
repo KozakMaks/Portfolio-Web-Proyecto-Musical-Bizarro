@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Experiencia Musical Bizarra 2.0</title>
+  <link rel="icon" href="icono.png">
+  
+  <!-- Google Fonts y Anime.js -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+  <!-- GSAP (para animaciones suaves en scroll) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
+
+  <!-- Font Awesome para íconos de redes sociales -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <style>
+    /* VARIABLES CSS */
+    :root {
+      --color-primary: #ff0055;
+      --color-secondary: #8800ff;
+      --color-tertiary: #00ffd5;
+      --color-dark: #1b1b1b;
+      --color-light-bg: #f9f9f9;
+      --color-fg: #ffffff;
+      --color-glitch1: #ff00a1;
+      --color-glitch2: #04f5ff;
+      --color-glitch3: #ffea00;
+    }
+
+    /* RESETEO BÁSICO y FUENTE */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      cursor: none; /* Cursor personalizado */
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--color-dark);
+      color: var(--color-light-bg);
+    }
+    a { 
+      color: inherit; 
+      text-decoration: none; 
+    }
+
+    /* OCULTAR SCROLLBAR */
+    ::-webkit-scrollbar { display: none; }
+    body { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* CURSOR PERSONALIZADO */
+    .cursor-custom {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 30px;
+      height: 30px;
+      border: 2px solid var(--color-primary);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99999;
+      transition: transform 0.1s, background-color 0.2s, opacity 0.2s;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-ghost {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--color-secondary);
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: 99998;
+      transition: transform 0.2s, opacity 0.2s;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: difference;
+    }
+    .cursor-hover {
+      background-color: var(--color-primary);
+      transform: scale(1.5) translate(-50%, -50%);
+    }
+    .cursor-click {
+      background-color: var(--color-tertiary);
+      transform: scale(0.8) translate(-50%, -50%);
+    }
+
+    /* HEADER (fijo arriba, sin animación) */
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(5px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-tertiary);
+      letter-spacing: 1px;
+      transition: text-shadow 0.3s;
+    }
+    .logo-icon {
+      height: 30px; 
+      margin-right: 0.5rem;
+    }
+    .logo:hover {
+      text-shadow: 0 0 5px var(--color-tertiary);
+    }
+    nav {
+      margin-left: auto; 
+    }
+    nav ul { 
+      list-style: none; 
+      display: flex; 
+      gap: 1.5rem; 
+    }
+    nav ul li { 
+      position: relative; 
+    }
+    nav ul li a {
+      font-weight: 600;
+      position: relative;
+      padding: 0.3rem 0;
+      transition: color 0.2s;
+    }
+    nav ul li a:hover { 
+      color: var(--color-primary); 
+    }
+    nav ul li a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background-color: var(--color-primary);
+      transition: width 0.3s;
+    }
+    nav ul li a:hover::after { width: 100%; }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 4px;
+    }
+    .hamburger span { 
+      height: 3px; 
+      width: 25px; 
+      background: var(--color-fg); 
+      border-radius: 2px; 
+    }
+
+    /* SECCIÓN HERO (sin animación) */
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 0 5vw;
+      background: linear-gradient(180deg, #2c3e50, #4ca1af);
+      overflow: hidden;
+      z-index: 2;
+    }
+    .hero-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+    .hero-content {
+      max-width: 700px;
+      color: var(--color-fg);
+    }
+    .hero-content h1 {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      position: relative;
+      line-height: 1.1;
+      z-index: 3;
+    }
+    .hero-content h1 span { 
+      color: var(--color-primary); 
+    }
+    .hero-content h1:hover { 
+      animation: glitchText 1s; 
+    }
+    @keyframes glitchText {
+      0% { 
+        text-shadow: 2px 0 var(--color-glitch1), -2px 0 var(--color-glitch2); 
+      }
+      20% { 
+        text-shadow: -2px 0 var(--color-glitch1), 2px 0 var(--color-glitch2); 
+      }
+      40% { 
+        text-shadow: 2px 0 var(--color-glitch2), -2px 0 var(--color-glitch3); 
+      }
+      60% { 
+        text-shadow: -3px 0 var(--color-glitch1), 3px 0 var(--color-glitch2); 
+      }
+      80% { 
+        text-shadow: 2px 0 var(--color-glitch3), -2px 0 var(--color-glitch1); 
+      }
+      100% { 
+        text-shadow: none; 
+      }
+    }
+    .hero-content p {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .hero-btn {
+      display: inline-block;
+      padding: 0.8rem 1.5rem;
+      background: var(--color-primary);
+      color: #fff;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .hero-btn:hover {
+      background: var(--color-secondary);
+      transform: scale(1.05);
+    }
+
+    /* ABOUT */
+    .about {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #FF00F7, #00FFFB, #FFEA00);
+      background-size: 300% 300%;
+      animation: movingGradient 6s infinite alternate;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 5rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .about h2 { 
+      font-size: 3rem; 
+      margin-bottom: 1rem; 
+      position: relative; 
+      z-index: 2; 
+    }
+    .about p {
+      max-width: 800px;
+      line-height: 1.5;
+      margin-bottom: 2rem;
+      z-index: 2;
+      transition: transform 0.3s, color 0.3s;
+    }
+    .about p:hover { 
+      transform: scale(1.02); 
+      color: var(--color-primary); 
+    }
+    .about::before {
+      content: '';
+      position: absolute;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background: repeating-linear-gradient(-45deg, rgba(255,0,85,0.08) 0px, rgba(0,255,213,0.08) 15px, rgba(136,0,255,0.08) 30px);
+      opacity: 0.1;
+      z-index: 1;
+      animation: aboutGlitch 3s infinite;
+    }
+    @keyframes aboutGlitch {
+      0%   { transform: translateX(0) translateY(0); }
+      25%  { transform: translateX(-10px) translateY(5px); }
+      50%  { transform: translateX(10px) translateY(-5px); }
+      75%  { transform: translateX(-5px) translateY(-10px); }
+      100% { transform: translateX(0) translateY(0); }
+    }
+    .about h2:hover { 
+      animation: glitchHeading 0.7s; 
+    }
+    @keyframes glitchHeading {
+      0% { 
+        text-shadow: 2px 0 var(--color-glitch1), -2px 0 var(--color-glitch2); 
+      }
+      25% { 
+        text-shadow: -2px 0 var(--color-glitch2), 2px 0 var(--color-glitch1); 
+      }
+      50% { 
+        text-shadow: 2px 0 var(--color-glitch2), -2px 0 var(--color-glitch3); 
+      }
+      75% { 
+        text-shadow: -3px 0 var(--color-glitch1), 3px 0 var(--color-glitch2); 
+      }
+      100% { 
+        text-shadow: none; 
+      }
+    }
+
+    /* AUDIO */
+    .audio-section {
+      min-height: 100vh;
+      background: linear-gradient(90deg, #FF00F7, #00FF1C, #FFEA00);
+      background-size: 300% 300%;
+      animation: movingGradient 6s infinite alternate;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 2rem;
+      text-align: center;
+      position: relative;
+      color: #fff;
+    }
+    .audio-section::before {
+      content: '';
+      position: absolute;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background: repeating-linear-gradient(0deg, rgba(255,0,85,0.05) 0px, rgba(0,255,213,0.05) 5px, rgba(136,0,255,0.05) 10px);
+      animation: glitchAudioBg 4s infinite ease-in-out;
+      pointer-events: none;
+      z-index: 1;
+    }
+    @keyframes glitchAudioBg {
+      0% { transform: translateX(0); opacity: 0.1; }
+      25% { transform: translateX(-10px); opacity: 0.2; }
+      50% { transform: translateX(10px); opacity: 0.25; }
+      75% { transform: translateX(-5px); opacity: 0.2; }
+      100% { transform: translateX(0); opacity: 0.1; }
+    }
+    .audio-section h2,
+    .audio-section p,
+    .audio-section .tracks-container { 
+      position: relative; 
+      z-index: 2; 
+    }
+    .audio-section h2 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: inline-block;
+      transition: transform 0.3s, color 0.3s;
+    }
+    .audio-section h2:hover {
+      transform: scale(1.05);
+      color: var(--color-secondary);
+    }
+    .tracks-container {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    .track-button {
+      background: var(--color-primary);
+      border: none;
+      border-radius: 8px;
+      padding: 0.8rem 1.2rem;
+      color: #fff;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: transform 0.3s, background 0.3s;
+    }
+    .track-button:hover {
+      background: var(--color-secondary);
+      transform: scale(1.05);
+    }
+    .track-icon { 
+      font-size: 1.5rem; 
+    }
+
+    /* CAOS */
+    .chaos-section {
+      min-height: 100vh;   
+      background: linear-gradient(160deg, #ff0066, #00fffb, #ffea00);
+      background-size: 300% 300%;
+      animation: movingGradient 6s infinite alternate;
+      color: #fff;
+      position: relative;
+      padding: 5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .chaos-section h2 {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 2;
+      transition: transform 0.3s;
+    }
+    .chaos-section h2:hover {
+      transform: scale(1.05) rotate(2deg);
+    }
+    .chaos-text {
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+      z-index: 2;
+      position: relative;
+    }
+    .chaos-text p { 
+      margin-bottom: 1.5rem; 
+    }
+    .chaos-glitch {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; 
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .chaos-glitch div {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background: var(--color-glitch2);
+      opacity: 0;
+      animation: glitchPix 3s infinite;
+    }
+    @keyframes glitchPix {
+      0% { 
+        opacity: 0; 
+        transform: translateY(0); 
+      }
+      10% { 
+        opacity: 0.5; 
+        transform: translateY(20px); 
+      }
+      20% { 
+        opacity: 1; 
+        transform: translateY(-10px) translateX(5px); 
+      }
+      30% { 
+        opacity: 0; 
+      }
+      100% { 
+        opacity: 0; 
+      }
+    }
+
+    /* SERVICIOS */
+    .services-section {
+      min-height: 100vh;
+      position: relative;
+      z-index: 2;
+      padding: 8rem 2rem;
+      background: linear-gradient(135deg, #ff00f7, #00f7ff, #ff0066);
+      background-size: 300% 300%;
+      animation: movingGradient 6s infinite alternate;
+      color: #fff;
+      text-align: center;
+      overflow: hidden;
+    }
+    .services-section h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      transition: transform 0.3s, color 0.3s;
+    }
+    .services-section h2:hover {
+      transform: scale(1.05);
+      color: var(--color-tertiary);
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(336px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      justify-items: center;
+    }
+    .service-card {
+      background: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+      position: relative;
+    }
+    .service-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .service-card video {
+      width: 100%;
+      height: 216px;
+      object-fit: cover;
+      display: block;
+    }
+    .service-card .service-info { 
+      padding: 3rem; 
+    }
+    .service-card .service-info h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #000;
+    }
+    .service-card .service-info p {
+      font-size: 1rem;
+      color: #555;
+    }
+
+    /* GALERÍA */
+    .gallery-section {
+      min-height: 100vh;
+      position: relative;
+      z-index: 2;
+      padding: 3rem 1rem 0; /* Sin padding inferior */
+      background: linear-gradient(135deg, #00fffb, #ff0066, #ffea00);
+      background-size: 300% 300%;
+      animation: movingGradient 6s infinite alternate;
+      color: #fff;
+      text-align: center;
+      overflow: hidden;
+    }
+    .gallery-section::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #3F51B5, rgba(0, 255, 213, 0.2));
+      background-size: 200% 200%;
+      animation: galleryBgAnim 8s ease infinite;
+      z-index: -1;
+    }
+    @keyframes galleryBgAnim {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .gallery-section h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .gallery-section p {
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+    .gallery-section > * {
+      padding-top: 1rem;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .gallery-card {
+      position: relative;
+      background-color: #fff;
+      color: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .gallery-card:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 8px 20px rgba(255,0,85,0.4);
+    }
+    .gallery-card img {
+      width: 100%;
+      display: block;
+      height: 127.5px;
+      object-fit: cover;
+    }
+    .gallery-card .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2));
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 1;
+    }
+    .gallery-card:hover .overlay { 
+      opacity: 1; 
+    }
+    .gallery-card .gallery-info {
+      position: relative;
+      padding: 0.5rem;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .gallery-card .gallery-info h4 {
+      margin-bottom: 0.3rem;
+      color: var(--color-dark);
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    .gallery-card .gallery-info p {
+      color: #555;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    /* CONTACTO */
+    .contact-section {
+      min-height: 100vh;
+      position: relative;
+      z-index: 2;
+      padding: 5rem 2rem;
+      background: linear-gradient(135deg, #ff0066, #00f7ff, #ffea00);
+      background-size: 300% 300%;
+      animation: movingGradient 6s infinite alternate;
+      color: #fff;
+      text-align: center;
+      overflow: hidden;
+    }
+    .contact-section h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      transition: transform 0.3s, color 0.3s;
+    }
+    .contact-section h2:hover {
+      transform: scale(1.05);
+      color: var(--color-tertiary);
+    }
+    .contact-section p { 
+      margin-bottom: 2rem; 
+    }
+    .contact-form-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      color: #333;
+      position: relative;
+      z-index: 2;
+    }
+    .contact-form-container form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .contact-form-container input,
+    .contact-form-container textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-family: inherit;
+      transition: border 0.3s, box-shadow 0.3s;
+    }
+    .contact-form-container input:focus,
+    .contact-form-container textarea:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 5px var(--color-primary);
+      outline: none;
+    }
+    .contact-form-container button {
+      padding: 0.8rem 1.2rem;
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .contact-form-container button:hover {
+      background: var(--color-secondary);
+      transform: scale(1.03);
+    }
+    .social-links {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    /* Ajustes para Font Awesome y colores de marca */
+    .social-links a {
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 2px solid var(--color-dark);
+      transition: transform 0.3s, background 0.3s;
+      background: var(--color-dark);
+      color: #fff;
+    }
+    /* Colores de marca al hacer hover */
+    .social-links a:hover {
+      transform: scale(1.1) rotate(5deg);
+      background: var(--color-secondary);
+      color: #fff; /* Ícono queda blanco sobre el hover */
+    }
+
+    /* FOOTER FIJO, ANIMADO AL FINAL DE LA PÁGINA */
+    footer {    
+      bottom: 0;           
+      left: 0;
+      width: 100%;
+      z-index: 99999;
+      text-align: center;
+      padding: 1rem;
+      /* Texto en blanco */
+      color: #fff;
+      /* Gradiente animado de fondo */
+      background: linear-gradient(270deg, #ff0055, #8800ff, #00ffd5, #ff0055);
+      background-size: 600% 600%;
+      /* Se combinan dos animaciones: la del fondo y la del texto */
+      animation: footerGradientAnimation 10s ease infinite, footerFlicker 3s infinite alternate;
+    }
+
+    @keyframes footerGradientAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+    /* Animación sencilla de parpadeo / glitch del texto del footer */
+    @keyframes footerFlicker {
+      0%, 100% {
+        text-shadow: 0 0 5px var(--color-primary);
+      }
+      50% {
+        text-shadow: 0 0 15px var(--color-secondary);
+      }
+    }
+
+    /* Animación base de gradientes (se usa en otras secciones) */
+    @keyframes movingGradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav ul {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: rgba(0, 0, 0, 0.9);
+        flex-direction: column;
+        width: 200px;
+        padding: 1rem;
+        display: none;
+        z-index: 1001;
+      }
+      nav ul.open { 
+        display: flex; 
+      }
+      .hamburger {
+        display: flex;
+        position: absolute;
+        right: 2rem;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cursor personalizado -->
+  <div class="cursor-custom" id="customCursor"></div>
+  <div class="cursor-ghost" id="cursorGhost"></div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <img src="icono.png" alt="Icono" class="logo-icon">
+      MúsicaBizarra
+    </div>
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav>
+      <ul id="navMenu">
+        <li><a href="#hero">Inicio</a></li>
+        <li><a href="#about">Acerca</a></li>
+        <li><a href="#audioSection">Audio</a></li>
+        <li><a href="#chaosSection">Caos</a></li>
+        <li><a href="#servicesSection">Servicios</a></li>
+        <li><a href="#gallerySection">Galería</a></li>
+        <li><a href="#contactSection">Contacto</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <video class="hero-video" id="heroVideo" autoplay loop muted playsinline>
+      <source src="video de inicio.mp4" type="video/mp4">
+    </video>
+    <div class="hero-content">
+      <h1>Experiencia <span>Musical</span> <br/> Bizarra y Psicodélica</h1>
+      <p>Con ritmos, efectos glitch y locuras visuales. Prepárate para un viaje único.</p>
+      <a href="#audioSection" class="hero-btn">Sumérgete</a>
+    </div>
+  </section>
+
+  <!-- ABOUT (se animará con GSAP) -->
+  <section class="about" id="about">
+    <h2>¿Quiénes Somos?</h2>
+    <p>
+      Somos un colectivo de amantes de la música y la cultura visual experimental. Creemos en romper los límites de la experiencia tradicional: cada sonido se transforma en una sinfonía de colores y cada imagen en un eco hipnótico.
+    </p>
+    <p>
+      Nuestra pasión es sumergirte en una atmósfera surrealista, mientras jugamos con tus sentidos e inspiramos tu creatividad.
+    </p>
+  </section>
+
+  <!-- AUDIO -->
+  <section class="audio-section" id="audioSection">
+    <h2>Activa Tus Sentidos</h2>
+    <p>Elige una pista para sumergirte en la experiencia.</p>
+    <div class="tracks-container">
+      <button class="track-button" data-audio="1">
+        <span class="track-icon">🎵</span>
+        <span class="track-label">Pista 1</span>
+      </button>
+      <button class="track-button" data-audio="2">
+        <span class="track-icon">🎵</span>
+        <span class="track-label">Pista 2</span>
+      </button>
+      <button class="track-button" data-audio="3">
+        <span class="track-icon">🎵</span>
+        <span class="track-label">Pista 3</span>
+      </button>
+      <button class="track-button" data-stop>
+        <span class="track-icon">⏹️</span>
+        <span class="track-label">Stop</span>
+      </button>
+    </div>
+    <audio id="audioTrack1" src="https://www.w3schools.com/html/horse.mp3" loop></audio>
+    <audio id="audioTrack2" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+    <audio id="audioTrack3" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" loop></audio>
+  </section>
+
+  <!-- CAOS -->
+  <section class="chaos-section" id="chaosSection">
+    <h2>Sumérgete en el Caos</h2>
+    <div class="chaos-text">
+      <p>
+        A medida que te adentras en este espacio, sentirás cómo el ritmo se fragmenta y se reconstruye en formas inesperadas. Cada nota se disuelve en una ola de energía, y el sonido estalla en emociones intensas.
+      </p>
+      <p>
+        No temas a la disonancia; abraza la intensidad de cada vibración y permite que la música te lleve a un estado de liberación sensorial.
+      </p>
+      <p>
+        Deja que el caos musical te envuelva y descubre la belleza en la imperfección de cada compás.
+      </p>
+    </div>
+    <div class="chaos-glitch" id="chaosGlitch"></div>
+  </section>
+
+  <!-- SERVICIOS -->
+  <section class="services-section" id="servicesSection">
+    <h2>Nuestros Servicios</h2>
+    <div class="services-grid">
+      <a href="servicio1.html">
+        <div class="service-card">
+          <video width="100%" autoplay loop muted>
+            <source src="produccion musical.mp4" type="video/mp4">
+            Tu navegador no soporta el video.
+          </video>
+          <div class="service-info">
+            <h3>Producción Musical</h3>
+            <p>Producción musical profesional para artistas emergentes.</p>
+          </div>
+        </div>
+      </a>
+      <a href="servicio2.html">
+        <div class="service-card">
+          <video width="100%" autoplay loop muted>
+            <source src="grabacion en estudio.mp4" type="video/mp4">
+            Tu navegador no soporta el video.
+          </video>
+          <div class="service-info">
+            <h3>Grabación en Estudio</h3>
+            <p>Grabación en estudio con equipos de última generación.</p>
+          </div>
+        </div>
+      </a>
+      <a href="servicio3.html">
+        <div class="service-card">
+          <video width="100%" autoplay loop muted>
+            <source src="Evento en Vivo.mp4" type="video/mp4">
+            Tu navegador no soporta el video.
+          </video>
+          <div class="service-info">
+            <h3>Eventos en Vivo</h3>
+            <p>Organización de conciertos y eventos inolvidables.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- GALERÍA -->
+  <section class="gallery-section" id="gallerySection">
+    <h2>Galería Musical</h2>
+    <p>Descubre nuestras creaciones más recientes</p>
+    <div class="gallery-grid">
+      <div class="gallery-card">
+        <img src="1.svg" alt="Luces Vibrantes" />
+        <div class="overlay"></div>
+        <div class="gallery-info">
+          <h4>Luces Vibrantes</h4>
+          <p>Iluminación que transforma el escenario.</p>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <img src="2.svg" alt="Ritmos Orgánicos" />
+        <div class="overlay"></div>
+        <div class="gallery-info">
+          <h4>Ritmos Orgánicos</h4>
+          <p>Conexión íntima entre notas y emociones.</p>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <img src="3.svg" alt="Escenario Infinito" />
+        <div class="overlay"></div>
+        <div class="gallery-info">
+          <h4>Escenario Infinito</h4>
+          <p>Un panorama sonoro que trasciende límites.</p>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <img src="4.svg" alt="Jazz Urbano" />
+        <div class="overlay"></div>
+        <div class="gallery-info">
+          <h4>Jazz Urbano</h4>
+          <p>Improvisación en cada acorde, vibrante y crudo.</p>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <img src="5.svg" alt="Vinilo Iluminado" />
+        <div class="overlay"></div>
+        <div class="gallery-info">
+          <h4>Vinilo Iluminado</h4>
+          <p>El resplandor del sonido clásico en cada surco.</p>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <img src="6.svg" alt="Concierto Onírico" />
+        <div class="overlay"></div>
+        <div class="gallery-info">
+          <h4>Concierto Onírico</h4>
+          <p>Un espectáculo en vivo que desafía la realidad.</p>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <img src="7.svg" alt="Melodía Submarina" />
+        <div class="overlay"></div>
+        <div class="gallery-info">
+          <h4>Melodía Submarina</h4>
+          <p>Sumérgete en un océano de armonías.</p>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <img src="8.svg" alt="Puente Musical" />
+        <div class="overlay"></div>
+        <div class="gallery-info">
+          <h4>Puente Musical</h4>
+          <p>Uniendo generaciones a través del poder del ritmo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section class="contact-section" id="contactSection">
+    <h2>¡Contáctanos!</h2>
+    <p>¿Listo para llevar tu proyecto al siguiente nivel musical? Escríbenos.</p>
+    <div class="contact-form-container">
+      <form>
+        <input type="text" name="nombre" placeholder="Tu nombre" required>
+        <input type="email" name="correo" placeholder="Tu correo" required>
+        <textarea name="mensaje" rows="5" placeholder="Mensaje" required></textarea>
+        <button type="submit">Enviar</button>
+      </form>
+      <div class="social-links">
+        <!-- Íconos de redes con Font Awesome -->
+        <a href="https://facebook.com" target="_blank" aria-label="Facebook">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://twitter.com" target="_blank" aria-label="Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+        <a href="https://instagram.com" target="_blank" aria-label="Instagram">
+          <i class="fab fa-instagram"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    &copy; 2025 Proyecto Musical Bizarro - Todos los derechos reservados
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script>
+    // GSAP para animaciones de scroll
+    document.addEventListener('DOMContentLoaded', () => {
+      gsap.registerPlugin(ScrollTrigger);
+
+      const animatedSections = [
+        "#about",
+        "#audioSection",
+        "#chaosSection",
+        "#servicesSection",
+        "#gallerySection",
+        "#contactSection"
+      ];
+
+      animatedSections.forEach(selector => {
+        gsap.from(selector, {
+          scrollTrigger: {
+            trigger: selector,
+            start: "top 80%",
+            once: true
+          },
+          y: 100,
+          opacity: 0,
+          duration: 1,
+          ease: "power2.out"
+        });
+      });
+    });
+
+    // CURSOR PERSONALIZADO
+    const customCursor = document.getElementById('customCursor');
+    const ghostCursor = document.getElementById('cursorGhost');
+    document.addEventListener('mousemove', e => {
+      customCursor.style.top = e.clientY + 'px';
+      customCursor.style.left = e.clientX + 'px';
+      ghostCursor.style.top = e.clientY + 'px';
+      ghostCursor.style.left = e.clientX + 'px';
+    });
+    document.addEventListener('mousedown', () => {
+      customCursor.classList.add('cursor-click');
+      ghostCursor.classList.add('cursor-click');
+    });
+    document.addEventListener('mouseup', () => {
+      customCursor.classList.remove('cursor-click');
+      ghostCursor.classList.remove('cursor-click');
+    });
+    const hoverables = document.querySelectorAll('button, a, .gallery-card, nav ul li, .service-card');
+    hoverables.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        customCursor.classList.add('cursor-hover');
+        ghostCursor.classList.add('cursor-hover');
+      });
+      el.addEventListener('mouseleave', () => {
+        customCursor.classList.remove('cursor-hover');
+        ghostCursor.classList.remove('cursor-hover');
+      });
+    });
+
+    // PARALLAX VIDEO HERO
+    const heroVideo = document.getElementById('heroVideo');
+    window.addEventListener('scroll', () => {
+      const offset = window.pageYOffset;
+      heroVideo.style.transform = 'translateY(' + (offset * 0.3) + 'px)';
+    });
+
+    // AUDIO Y CONTROL DE PISTAS
+    const audio1 = document.getElementById('audioTrack1');
+    const audio2 = document.getElementById('audioTrack2');
+    const audio3 = document.getElementById('audioTrack3');
+    function stopAllAudios() {
+      [audio1, audio2, audio3].forEach(aud => {
+        aud.pause();
+        aud.currentTime = 0;
+      });
+    }
+    let audioCtx, source1, source2, source3;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        source1 = audioCtx.createMediaElementSource(audio1);
+        source2 = audioCtx.createMediaElementSource(audio2);
+        source3 = audioCtx.createMediaElementSource(audio3);
+        source1.connect(audioCtx.destination);
+        source2.connect(audioCtx.destination);
+        source3.connect(audioCtx.destination);
+      }
+    }
+    document.querySelectorAll('.track-button').forEach(button => {
+      button.addEventListener('click', () => {
+        initAudio();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        anime({
+          targets: button.querySelector('.track-icon'),
+          scale: [1, 1.2, 1],
+          duration: 500,
+          easing: 'easeInOutQuad'
+        });
+        if (button.hasAttribute('data-stop')) {
+          stopAllAudios();
+          return;
+        }
+        stopAllAudios();
+        const audioNum = button.dataset.audio;
+        if (audioNum === '1') { audio1.play(); }
+        else if (audioNum === '2') { audio2.play(); }
+        else if (audioNum === '3') { audio3.play(); }
+      });
+    });
+
+    // FORMULARIO DE CONTACTO (simulación)
+    const contactForm = document.querySelector('.contact-form-container form');
+    contactForm.addEventListener('submit', e => {
+      e.preventDefault();
+      alert('¡Mensaje Enviado! (Simulación)');
+      contactForm.reset();
+    });
+
+    // EFECTO CAÓTICO (divs glitch)
+    const chaosGlitch = document.getElementById('chaosGlitch');
+    for (let i = 0; i < 15; i++) {
+      const pix = document.createElement('div');
+      pix.style.top = Math.random() * 100 + '%';
+      pix.style.left = Math.random() * 100 + '%';
+      pix.style.animationDelay = (Math.random() * 3) + 's';
+      chaosGlitch.appendChild(pix);
+    }
+
+    // MENÚ HAMBURGUESA
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('navMenu');
+    hamburger.addEventListener('click', () => {
+      navMenu.classList.toggle('open');
+    });
+  </script>
+</body>
+</html>
